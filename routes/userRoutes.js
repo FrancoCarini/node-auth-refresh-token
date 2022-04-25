@@ -1,9 +1,16 @@
 const express = require("express")
 const router = express.Router()
 
-const { login, refreshToken } = require("../controllers/userController")
+const {
+  login,
+  refresh,
+  create,
+  logout,
+} = require("../controllers/userController")
 
-router.post("login", login)
-router.post("refresh-token", verifyJWT, refreshToken)
+router.post("/", create)
+router.post("/login", login)
+router.get("/refresh", refresh)
+router.get("/logout", logout)
 
 module.exports = router
