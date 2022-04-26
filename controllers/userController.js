@@ -95,7 +95,7 @@ const create = asyncHandler(async (req, res, next) => {
   })
 
   user.password = null
-  res.status(200).json(user)
+  res.status(201).json(user)
 })
 
 const logout = asyncHandler(async (req, res, next) => {
