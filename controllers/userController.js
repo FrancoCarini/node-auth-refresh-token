@@ -56,12 +56,17 @@ const login = asyncHandler(async (req, res, next) => {
   foundUser.refreshToken = undefined
   foundUser.password = undefined
 
-  res.cookie("jwt", refreshToken, {
+  const cookieOptions = {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
-    secure: true,
     sameSite: "None",
-  })
+  }
+
+  if (process.env.environment === "production") {
+    cookieOptions.secure = true
+  }
+
+  res.cookie("jwt", refreshToken, cookieOptions)
   res.json({ accessToken, user: foundUser })
 })
 
@@ -107,10 +112,20 @@ const logout = asyncHandler(async (req, res, next) => {
 
   const refreshToken = cookies.jwt
 
+  const cookieOptions = {
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000,
+    sameSite: "None",
+  }
+
+  if (process.env.environment === "production") {
+    cookieOptions.secure = true
+  }
+
   // Check refresh token in db
   const foundUser = await User.findOne({ refreshToken })
   if (!foundUser) {
-    res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true })
+    res.clearCookie("jwt", cookieOptions)
     return res.sendStatus(204)
   }
 
@@ -118,7 +133,7 @@ const logout = asyncHandler(async (req, res, next) => {
   foundUser.refreshToken = ""
   const result = await foundUser.save()
 
-  res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true })
+  res.clearCookie("jwt", cookieOptions)
   res.sendStatus(204)
 })
 
