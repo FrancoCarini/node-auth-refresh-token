@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  mongodb:
+    container_name: authapp_mongodb
+    image: mongo:4.4.4
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: francodev
+    volumes:
+      - mongo_data:/data/db
+  api:
+    container_name: authapp_api
+    build: ./
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    env_file:
+      - ./.env
+    depends_on:
+      - mongodb
+  mongo-express:
+    container_name: authapp_mongoexpress
+    image: mongo-express
+    ports:
+      - "8000:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: francodev
+      ME_CONFIG_MONGODB_SERVER: mongodb
+    depends_on:
+      - mongodb
+volumes:
+  mongo_data:

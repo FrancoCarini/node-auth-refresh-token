@@ -53,13 +53,16 @@ const login = asyncHandler(async (req, res, next) => {
   foundUser.refreshToken = refreshToken
   await foundUser.save()
 
+  foundUser.refreshToken = undefined
+  foundUser.password = undefined
+
   res.cookie("jwt", refreshToken, {
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000,
     secure: true,
     sameSite: "None",
   })
-  res.json({ accessToken })
+  res.json({ accessToken, user: foundUser })
 })
 
 const refresh = asyncHandler(async (req, res, next) => {
